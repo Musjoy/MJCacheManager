@@ -1,0 +1,6 @@
+use_frameworks!
+target 'MJCacheManager_Tests' do
+  pod 'MJCacheManager', :path => '../'
+  
+  
+end
