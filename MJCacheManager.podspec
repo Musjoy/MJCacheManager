@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.homepage         = 'https://github.com/Musjoy/MJCacheManager'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Ray' => 'Ray.musjoy@gmail.com' }
-  s.source           = { :git => 'https://github.com/Musjoy/MJCacheManager.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/Musjoy/MJCacheManager.git', :tag => "v-#{s.version}" }
 
   s.ios.deployment_target = '7.0'
 
