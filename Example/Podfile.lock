@@ -1,0 +1,32 @@
+PODS:
+  - AFNetworking/NSURLSession (3.1.0):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (3.1.0)
+  - AFNetworking/Security (3.1.0)
+  - AFNetworking/Serialization (3.1.0)
+  - MJCacheManager (0.1.0):
+    - MJWebService (~> 0.1)
+    - ModuleCapability (~> 0.1)
+  - MJWebService (0.1.1):
+    - AFNetworking/NSURLSession (~> 3.1.0)
+    - ModuleCapability (~> 0.1.1)
+  - ModuleCapability (0.1.2)
+
+DEPENDENCIES:
+  - MJCacheManager (from `../`)
+
+EXTERNAL SOURCES:
+  MJCacheManager:
+    :path: ../
+
+SPEC CHECKSUMS:
+  AFNetworking: 5e0e199f73d8626b11e79750991f5d173d1f8b67
+  MJCacheManager: c0cd323ffa29822fe044563d0ba9be2510f83617
+  MJWebService: ebe871b8f7cf648e1a49daf071ada69b902d8270
+  ModuleCapability: 35cea7154ff855362682e90ecf1be529a533c931
+
+PODFILE CHECKSUM: c255e93859066ca658b93069b0300e27befce340
+
+COCOAPODS: 1.0.1
