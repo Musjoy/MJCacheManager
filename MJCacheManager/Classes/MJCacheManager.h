@@ -4,11 +4,10 @@
 //
 //  Created by 黄磊 on 16/4/6.
 //  Copyright © 2016年 Musjoy. All rights reserved.
-//  缓存管理
+//  缓存管理<MODULE_CACHE_MANAGER>
 
 
 #import <Foundation/Foundation.h>
-//#import "Utils.h"
 
 /// 本地音频保存目录
 #ifndef LOCAL_IMAGE_FOLDER_NAME
