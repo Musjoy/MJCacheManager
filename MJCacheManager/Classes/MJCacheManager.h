@@ -53,7 +53,7 @@ typedef NS_ENUM(int, UseCacheType) {
 /** 仅在wifi下显示图片 */
 @property (nonatomic, assign) BOOL fetchImageOnlyOnWifi;
 
-+ (MJCacheManager *)shareInstance;
++ (MJCacheManager *)sharedInstance;
 
 + (BOOL)canFetchImage;
 

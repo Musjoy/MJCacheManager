@@ -35,7 +35,7 @@ static MJCacheManager *s_cacheManager = nil;
 @implementation MJCacheManager
 
 // 获取缓存单例
-+ (MJCacheManager *)shareInstance
++ (MJCacheManager *)sharedInstance
 {
     if (s_cacheManager == nil)
     {
@@ -65,13 +65,13 @@ static MJCacheManager *s_cacheManager = nil;
     } else if (theReachableState == AFNetworkReachabilityStatusNotReachable) {
         return NO;
     } else {
-        return ![[self shareInstance] fetchImageOnlyOnWifi];
+        return ![[self sharedInstance] fetchImageOnlyOnWifi];
     }
 }
 
 + (NSObject *)getLocalFileWithUrl:(NSString *)fileUrl fileType:(CacheFileType)fileType completion:(MJCacheManagerBlock)completion
 {
-    return [[MJCacheManager shareInstance] getLocalFileWithUrl:fileUrl fileType:fileType completion:completion];
+    return [[MJCacheManager sharedInstance] getLocalFileWithUrl:fileUrl fileType:fileType completion:completion];
 }
 
 
@@ -89,14 +89,14 @@ static MJCacheManager *s_cacheManager = nil;
             completion:(MJCacheManagerBlock)completion
          progressBlock:(void (^)(float, long long, long long))progressBlock
 {
-    return [[MJCacheManager shareInstance] getFileWithUrl:fileUrl fileType:fileType useCache:useCache completion:completion progressBlock:progressBlock];
+    return [[MJCacheManager sharedInstance] getFileWithUrl:fileUrl fileType:fileType useCache:useCache completion:completion progressBlock:progressBlock];
 }
 
 + (void)reloadFileWith:(NSString *)fileUrl fileType:(CacheFileType)fileType completion:(MJCacheManagerBlock)completion
 {
     NSString *fileName = [self fileNameWithUrl:fileUrl];
     
-    [[MJCacheManager shareInstance] fetchFileWith:fileUrl locFileName:fileName fileType:fileType completion:completion progressBlock:nil];
+    [[MJCacheManager sharedInstance] fetchFileWith:fileUrl locFileName:fileName fileType:fileType completion:completion progressBlock:nil];
 }
 
 /**
@@ -112,7 +112,7 @@ static MJCacheManager *s_cacheManager = nil;
 {
     NSString *fileName = [self fileNameWithUrl:fileUrl];
     NSString *keyData = [NSString stringWithFormat:@"%@_%d_Data", fileName, fileType];
-    MJCacheManager *theCacheManager = [MJCacheManager shareInstance];
+    MJCacheManager *theCacheManager = [MJCacheManager sharedInstance];
     NSObject *data = nil;
     if (fileType == eCacheFileImage) {
         // 从文件中读取图片或头像缓存
