@@ -29,6 +29,17 @@ typedef void (^FinishBlock)();
 
 #pragma mark -
 
+/// 设置默认加载图片
++ (void)setPlaceholderImage:(UIImage *)image;
+
+
+/// 根据名称设置图片，图片可以是kServerUrl下的网络图片
+- (void)setImageWithName:(NSString *)aImageName;
+
+/// 根据名称设置图片，图片可以是kServerUrl下的网络图片，可自定义默认图片
+- (void)setImageWithName:(NSString *)aImageName placeholderImage:(UIImage *)placeholderImage;
+
+
 /** 设置网络图片, 可设置默认显示图片 */
 - (void)setImageUrl:(NSString *)imageUrl;
 

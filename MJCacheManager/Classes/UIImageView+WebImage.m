@@ -9,11 +9,46 @@
 #import "UIImageView+WebImage.h"
 #import "MJCacheManager.h"
 
+static UIImage *s_imgPlaceholder    = nil;
+
+
 @implementation UIImageView (WebImage)
+
++ (void)setPlaceholderImage:(UIImage *)image
+{
+    s_imgPlaceholder = image;
+}
+
+- (void)setImageWithName:(NSString *)aImageName
+{
+    [self setImageWithName:aImageName placeholderImage:s_imgPlaceholder];
+}
+
+- (void)setImageWithName:(NSString *)aImageName placeholderImage:(UIImage *)placeholderImage
+{
+    UIImage *theImage = [UIImage imageNamed:aImageName];
+    if (theImage == nil) {
+        // 网络图片需下载
+        if (![aImageName hasPrefix:@"http"]) {
+#ifdef kServerUrl
+            if ([aImageName hasPrefix:@"/"]) {
+                aImageName = [kServerUrl stringByAppendingString:aImageName];
+            } else {
+                aImageName = [NSString stringWithFormat:@"%@/%@", kServerUrl, aImageName];
+            }
+#else
+            return;
+#endif
+        }
+        [self setImageUrl:aImageName placeholderImage:placeholderImage];
+        return;
+    }
+    [self setImage:theImage];
+}
 
 - (void)setImageUrl:(NSString *)imageUrl
 {
-    [self setImageUrl:imageUrl placeholderImage:nil];
+    [self setImageUrl:imageUrl placeholderImage:s_imgPlaceholder];
 }
 
 - (void)setImageUrl:(NSString *)imageUrl placeholderImage:(UIImage *)placeholderImage
@@ -35,7 +70,7 @@
 
 - (void)setImageUrlWithJudge:(NSString *)imageUrl
 {
-    [self setImageUrlWithJudge:imageUrl placeholderImage:nil];
+    [self setImageUrlWithJudge:imageUrl placeholderImage:s_imgPlaceholder];
 }
 
 - (void)setImageUrlWithJudge:(NSString *)imageUrl placeholderImage:(UIImage *)placeholderImage
