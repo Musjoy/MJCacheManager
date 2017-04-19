@@ -20,7 +20,6 @@ typedef void (^FinishBlock)();
  *	@param 	useCacheOnly        是否仅使用缓存, 默认NO
  *	@param 	needJudge           是否判断是否需要下载图片 YES-需要判断; NO-不需要判断，即本地无缓存时回从网络下载, 默认NO
  *
- *	@return	void
  */
 - (void)setImageUrl:(NSString *)imageUrl
    placeholderImage:(UIImage *)placeholderImage

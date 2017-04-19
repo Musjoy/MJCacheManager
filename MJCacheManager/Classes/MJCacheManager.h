@@ -111,7 +111,6 @@ typedef NS_ENUM(int, UseCacheType) {
  *	@param 	fileType 	刷新缓存的文件类型
  *	@param 	completion  从网络获取完成的回调
  *
- *	@return	No return
  */
 + (void)reloadFileWith:(NSString *)fileUrl
               fileType:(CacheFileType)fileType
@@ -123,7 +122,6 @@ typedef NS_ENUM(int, UseCacheType) {
  *	@param 	fileUrl 	刷新缓存的网络url
  *	@param 	fileType 	刷新缓存的文件类型
  *
- *	@return	No return
  */
 + (void)refreshCacheWith:(NSString *)fileUrl
                 fileType:(CacheFileType)fileType;

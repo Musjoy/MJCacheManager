@@ -105,7 +105,6 @@ static MJCacheManager *s_cacheManager = nil;
  *	@param 	fileUrl 	需要刷新缓存的url
  *	@param 	fileType 	需要刷新缓存的文件类型
  *
- *	@return	null
  */
 + (void)refreshCacheWith:(NSString *)fileUrl fileType:(CacheFileType)fileType
 
@@ -225,15 +224,12 @@ static MJCacheManager *s_cacheManager = nil;
     if (completion == NULL) {
         completion = ^(BOOL isSucceed, NSString *message, NSObject *image) {};
     }
-    
-
 
     // 本地文件名，取md5
     NSString *fileName = [self.class fileNameWithUrl:fileUrl];;
     
     // 判断NSCache中是否有缓存
     NSObject *dataReturn = [self checkCache:fileName withFileType:fileType];
-    
     if (dataReturn) {
         // 本地存在该文件，直接返回
         completion(YES, @"文件读取成功", dataReturn);
@@ -241,7 +237,6 @@ static MJCacheManager *s_cacheManager = nil;
         if (useCache != eUseCacheNone) {
             return YES;
         }
-        
     }
     
     // 如果仅使用缓存的话，这里直接返回
@@ -249,31 +244,6 @@ static MJCacheManager *s_cacheManager = nil;
         // 如果仅使用缓存的话，这里没取到也直接返回，返回值未NO
         return NO;
     }
-    
-//    // 判断文件类型和缓存机制
-//    if (useCache != eUseCacheNone || fileType == eCacheFileImage || fileType == eCacheFileAvatar) {
-//        // 使用缓存，或者获去图片文件
-//        NSObject *dataReturn = [self checkCache:fileName withFileType:fileType];
-//        if (dataReturn) {
-//            if (fileType == eCacheFileImage || fileType == eCacheFileAvatar) {
-//                // 找到缓存图片，先返回图片，这里即使是不使用缓存也要先返回，让界面可以显示
-//                completion(YES, @"图片读取成功", dataReturn);
-//                if (useCache != eUseCacheNone) {
-//                    // 找到缓存，并且要使用缓存的话，直接返回
-//                    return YES;
-//                }
-//            } else {
-//                // 找到缓存，直接返回
-//                completion(YES, @"文件读取成功", dataReturn);
-//                return YES;
-//            }
-//        }
-//    }
-//    
-//    if (useCache == eUseCacheOnly) {
-//        // 如果仅使用缓存的话，这里没取到也直接返回，返回值未NO
-//        return NO;
-//    }
     
     // 没有找到缓存或不是用缓存的话，从服务器获取文件
     [self fetchFileWith:fileUrl
@@ -295,7 +265,6 @@ static MJCacheManager *s_cacheManager = nil;
  *	@param 	completion      完成的回调
  *	@param 	progressBlock 	进度回调
  *
- *	@return	void
  */
 - (void)fetchFileWith:(NSString *)fileUrl
           locFileName:(NSString *)fileName
@@ -525,7 +494,11 @@ static MJCacheManager *s_cacheManager = nil;
     NSString *aLocalPaths = [[self localPaths] objectForKey:folderName];
     if (aLocalPaths.length == 0) {
         NSError *error;
+#ifdef DEBUG
         NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+#else
+        NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+#endif
         if(documentPaths.count > 0) {
             NSString *docpath = [documentPaths objectAtIndex:0];
             if(docpath) {
