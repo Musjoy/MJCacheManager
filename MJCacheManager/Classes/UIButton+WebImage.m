@@ -39,7 +39,7 @@ static char kBtnImageIdentiferKey;
 - (void)setImageWithName:(NSString *)aImageName forState:(UIControlState)state placeholderImage:(UIImage *)placeholderImage
 {
     UIImage *theImage = [UIImage imageNamed:aImageName];
-    if (theImage == nil) {
+    if (theImage == nil && [aImageName rangeOfString:@"/"].length > 0) {
         // 网络图片需下载
         if (![aImageName hasPrefix:@"http"]) {
 #ifdef kServerUrl

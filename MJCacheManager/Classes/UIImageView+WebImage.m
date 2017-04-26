@@ -46,7 +46,8 @@ static char kImageIdentiferKey;
 - (void)setImageWithName:(NSString *)aImageName placeholderImage:(UIImage *)placeholderImage
 {
     UIImage *theImage = [UIImage imageNamed:aImageName];
-    if (theImage == nil) {
+    if (theImage == nil && [aImageName rangeOfString:@"/"].length > 0) {
+        // 只支持存在只是一级目录的图片进行网络下载
         // 网络图片需下载
         if (![aImageName hasPrefix:@"http"]) {
 #ifdef kServerUrl
