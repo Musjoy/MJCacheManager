@@ -8,16 +8,35 @@
 
 #import "UIImageView+WebImage.h"
 #import "MJCacheManager.h"
+#import <objc/runtime.h>
 
 static UIImage *s_imgPlaceholder    = nil;
 
+static char kImageIdentiferKey;
+
 
 @implementation UIImageView (WebImage)
+
+#pragma mark - Runtime
+
+- (void)setIdentifer:(NSString *)identifer {
+    objc_setAssociatedObject(self, &kImageIdentiferKey, identifer, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (NSString *)identifer {
+    return objc_getAssociatedObject(self, &kImageIdentiferKey);
+}
+
+
+#pragma mark - Public
 
 + (void)setPlaceholderImage:(UIImage *)image
 {
     s_imgPlaceholder = image;
 }
+
+
+#pragma mark - Image Name
 
 - (void)setImageWithName:(NSString *)aImageName
 {
@@ -40,11 +59,17 @@ static UIImage *s_imgPlaceholder    = nil;
             return;
 #endif
         }
+        // 拼接scale
+        aImageName = [aImageName stringByAppendingFormat:@"?scale=%d", (int)[[UIScreen mainScreen] scale]];
         [self setImageUrl:aImageName placeholderImage:placeholderImage];
         return;
     }
+    [self setIdentifer:nil];
     [self setImage:theImage];
 }
+
+
+#pragma mark - Image Url
 
 - (void)setImageUrl:(NSString *)imageUrl
 {
@@ -96,71 +121,28 @@ static UIImage *s_imgPlaceholder    = nil;
        useCacheOnly:(BOOL)useCacheOnly
           needJudge:(BOOL)needJudge
 {
-    if (imageUrl == nil || [imageUrl isEqualToString:@""])
-    {
-        if (![[NSThread currentThread] isMainThread]) {
-            LogError(@"在非主线程中");
-        }
-        if (errorImage) {
-            [self setImage:errorImage];
-        }else if (placeholderImage)
-        {
-            [self setImage:placeholderImage];
-        }
-        return;
-    }
-    
-    if (errorImage == nil) {
-        errorImage = placeholderImage;
-    }
-    
     UseCacheType useCacheType = eUseCacheFirst;
     if (useCacheOnly || (needJudge && ![MJCacheManager canFetchImage])) {
         useCacheType = eUseCacheOnly;
     }
     
-    self.tag = self.tag+1;
-    NSInteger identifer = self.tag;
-    
-    BOOL hasCache = [MJCacheManager getFileWithUrl:imageUrl
-                                        fileType:eCacheFileImage
-                                       useCache:useCacheType
-                                      completion:^(BOOL isSucceed, NSString *message, NSObject *data)
-                     {
-                         if (identifer != self.tag) {
-                             return;
-                         }
-                         if (isSucceed) {
-                             if (data) {
-                                 [self setImage:(UIImage *)data];
-                             }
-                         } else {
-                             [self setImage:errorImage];
-                         }
-                     }];
-    
-    if (!hasCache) {
-        [self setImage:placeholderImage];
-    }
+    [self setImageUrl:imageUrl placeholderImage:placeholderImage errorImage:errorImage useCache:useCacheType];
 }
-- (void)setImageUrlWithJudge:(NSString *)imageUrl placeholderImage:(UIImage *)placeholderImage finish:(FinishBlock)block
+
+
+- (void)setImageUrl:(NSString *)imageUrl
+   placeholderImage:(UIImage *)placeholderImage
+         errorImage:(UIImage *)errorImage
+           useCache:(UseCacheType)useCacheType
 {
-    UIImage *errorImage = nil;
-    BOOL useCacheOnly  = NO;
-    BOOL needJudge = YES;
-    
-    if (imageUrl == nil || [imageUrl isEqualToString:@""])
-    {
+    if (imageUrl == nil || [imageUrl isEqualToString:@""]) {
         if (![[NSThread currentThread] isMainThread]) {
             LogError(@"在非主线程中");
-        }
-        if (errorImage) {
+        } if (errorImage) {
             [self setImage:errorImage];
-        }else if (placeholderImage)
-        {
+        } else if (placeholderImage) {
             [self setImage:placeholderImage];
         }
-        block();
         return;
     }
     
@@ -168,80 +150,20 @@ static UIImage *s_imgPlaceholder    = nil;
         errorImage = placeholderImage;
     }
     
-    UseCacheType useCacheType = eUseCacheFirst;
-    if (useCacheOnly || (needJudge && ![MJCacheManager canFetchImage])) {
-        useCacheType = eUseCacheOnly;
-    }
-    
-    self.tag = self.tag+1;
-    NSInteger identifer = self.tag;
+    NSString *identifer = [[NSUUID UUID] UUIDString];
+    [self setIdentifer:identifer];
     
     BOOL hasCache = [MJCacheManager getFileWithUrl:imageUrl
-                                        fileType:eCacheFileImage
-                                        useCache:useCacheType
-                                      completion:^(BOOL isSucceed, NSString *message, NSObject *data)
+                                          fileType:eCacheFileImage
+                                          useCache:useCacheType
+                                        completion:^(BOOL isSucceed, NSString *message, NSObject *data)
                      {
-                         if (identifer != self.tag) {
+                         if (![identifer isEqualToString:[self identifer]]) {
                              return;
                          }
                          if (isSucceed) {
                              if (data) {
                                  [self setImage:(UIImage *)data];
-                             }
-                             block();
-                         } else {
-                             [self setImage:errorImage];
-                         }
-                     }];
-    
-    if (!hasCache) {
-        [self setImage:placeholderImage];
-    }
-}
-- (void)setImageUrl:(NSString *)imageUrl placeholderImage:(UIImage *)placeholderImage finish:(FinishBlock)block
-{
-    UIImage *errorImage = nil;
-    BOOL useCacheOnly = NO;
-    BOOL needJudge = YES;
-    if (imageUrl == nil || [imageUrl isEqualToString:@""])
-    {
-        if (![[NSThread currentThread] isMainThread]) {
-            LogError(@"在非主线程中");
-        }
-        if (errorImage) {
-            [self setImage:errorImage];
-        }else if (placeholderImage)
-        {
-            [self setImage:placeholderImage];
-        }
-        block();
-        return;
-    }
-    
-    if (errorImage == nil) {
-        errorImage = placeholderImage;
-    }
-    
-    UseCacheType useCacheType = eUseCacheFirst;
-    if (useCacheOnly || (needJudge && ![MJCacheManager canFetchImage])) {
-        useCacheType = eUseCacheOnly;
-    }
-    
-    self.tag = self.tag+1;
-    NSInteger identifer = self.tag;
-    
-    BOOL hasCache = [MJCacheManager getFileWithUrl:imageUrl
-                                        fileType:eCacheFileImage
-                                        useCache:useCacheType
-                                      completion:^(BOOL isSucceed, NSString *message, NSObject *data)
-                     {
-                         if (identifer != self.tag) {
-                             return;
-                         }
-                         if (isSucceed) {
-                             if (data) {
-                                 [self setImage:(UIImage *)data];
-                                 block();
                              }
                          } else {
                              [self setImage:errorImage];
@@ -252,4 +174,6 @@ static UIImage *s_imgPlaceholder    = nil;
         [self setImage:placeholderImage];
     }
 }
+
+
 @end

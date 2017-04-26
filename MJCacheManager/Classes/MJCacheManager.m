@@ -59,10 +59,10 @@ static MJCacheManager *s_cacheManager = nil;
 
 + (BOOL)canFetchImage
 {
-    AFNetworkReachabilityStatus theReachableState = [MJWebService reachableState];
-    if (theReachableState == AFNetworkReachabilityStatusReachableViaWiFi) {
+    MJReachabilityStatus theReachableState = [MJWebService reachableState];
+    if (theReachableState == MJReachabilityStatusReachableViaWiFi) {
         return YES;
-    } else if (theReachableState == AFNetworkReachabilityStatusNotReachable) {
+    } else if (theReachableState == MJReachabilityStatusNotReachable) {
         return NO;
     } else {
         return ![[self sharedInstance] fetchImageOnlyOnWifi];
@@ -216,15 +216,11 @@ static MJCacheManager *s_cacheManager = nil;
     // 远程的url为空或空字符串的话，直接返回
     if (fileUrl == nil || [fileUrl isEqualToString:@""]) {
         LogError(@"the fileUrl should not be nil!");
-        completion(NO, @"远程文件路径不能为空成功", nil);
+        completion ? completion(NO, @"远程文件路径不能为空成功", nil) : nil;
         return NO;
     }
-    
-    // 空值保护
-    if (completion == NULL) {
-        completion = ^(BOOL isSucceed, NSString *message, NSObject *image) {};
-    }
 
+    BOOL hasCache = NO;
     // 本地文件名，取md5
     NSString *fileName = [self.class fileNameWithUrl:fileUrl];;
     
@@ -232,17 +228,18 @@ static MJCacheManager *s_cacheManager = nil;
     NSObject *dataReturn = [self checkCache:fileName withFileType:fileType];
     if (dataReturn) {
         // 本地存在该文件，直接返回
-        completion(YES, @"文件读取成功", dataReturn);
+        hasCache = YES;
+        completion ? completion(YES, @"文件读取成功", dataReturn) : nil;
         // 如果设置不使用缓存的话，这里不能return
         if (useCache != eUseCacheNone) {
-            return YES;
+            return hasCache;
         }
     }
     
     // 如果仅使用缓存的话，这里直接返回
     if (useCache == eUseCacheOnly) {
         // 如果仅使用缓存的话，这里没取到也直接返回，返回值未NO
-        return NO;
+        return hasCache;
     }
     
     // 没有找到缓存或不是用缓存的话，从服务器获取文件
@@ -252,7 +249,7 @@ static MJCacheManager *s_cacheManager = nil;
              completion:completion
           progressBlock:progressBlock];
     
-    return NO;
+    return hasCache;
 }
 
 
@@ -300,10 +297,33 @@ static MJCacheManager *s_cacheManager = nil;
     // 开始请求文件
     [MJWebService startDownload:remoteFilePath
                    withSavePath:localFilePath
-                     completion:^(BOOL isSucceed, NSString *message)
+                     completion:^(BOOL isSucceed, NSString *message, id responseOrErr)
      {
          NSObject *fileData = nil;
          if (isSucceed) {
+             // 如果是图片，这里还需要判断scale
+             if (fileType == eCacheFileImage) {
+                 //
+                 NSHTTPURLResponse *response = responseOrErr;
+                 NSString *contentLocation = response.allHeaderFields[@"Content-Location"];
+                 if (contentLocation.length > 0) {
+                     // 搜索@位置
+                     NSRange range = [contentLocation rangeOfString:@"@"];
+                     if (range.length > 0) {
+                         NSString *scale = [contentLocation substringFromIndex:range.location];
+                         // 转移文件
+                         NSString *newFilePath = [localFilePath stringByAppendingString:scale];
+                         NSFileManager *fileManager = [NSFileManager defaultManager];
+                         if ([fileManager fileExistsAtPath:localFilePath]) {
+                             if ([fileManager fileExistsAtPath:newFilePath]) {
+                                 [fileManager removeItemAtPath:newFilePath error:nil];
+                             }
+                             [fileManager moveItemAtPath:localFilePath toPath:newFilePath error:nil];
+                         }
+                     }
+                 }
+                 NSLog(@"%@", response);
+             }
              // 获取成功，准备本地文件
              fileData = [self dataWithLocalFile:localFilePath andFileType:fileType];
              
@@ -420,7 +440,7 @@ static MJCacheManager *s_cacheManager = nil;
 {
     NSObject *returnData = nil;
     NSFileManager *fileHandler = [NSFileManager defaultManager];
-    if ([fileHandler fileExistsAtPath:localFilePath]) {
+    if (fileType == eCacheFileImage || [fileHandler fileExistsAtPath:localFilePath]) {
         // 文件存在
         if (fileType == eCacheFileImage) {
             // 如果是图片的话，直接读取图片文件
