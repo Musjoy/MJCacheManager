@@ -297,14 +297,14 @@ static MJCacheManager *s_cacheManager = nil;
     // 开始请求文件
     [MJWebService startDownload:remoteFilePath
                    withSavePath:localFilePath
-                     completion:^(BOOL isSucceed, NSString *message, id responseOrErr)
+                     completion:^(NSURLResponse *response, id responseData, NSError *error)
      {
          NSObject *fileData = nil;
-         if (isSucceed) {
+         if (!error) {
              // 如果是图片，这里还需要判断scale
              if (fileType == eCacheFileImage) {
                  //
-                 NSHTTPURLResponse *response = responseOrErr;
+                 NSHTTPURLResponse *response = responseData;
                  NSString *contentLocation = response.allHeaderFields[@"Content-Location"];
                  if (contentLocation.length > 0) {
                      // 搜索@位置
@@ -338,10 +338,10 @@ static MJCacheManager *s_cacheManager = nil;
          for (NSDictionary *dic in arr) {
              MJCacheManagerBlock cacheBlockTmp = dic[@"completion"];
              if (cacheBlockTmp) {
-                 if (isSucceed) {
-                     cacheBlockTmp(isSucceed, message, fileData);
+                 if (!error) {
+                     cacheBlockTmp(YES, @"Download succeed", fileData);
                  } else {
-                     cacheBlockTmp(isSucceed, message, fileData);
+                     cacheBlockTmp(NO, @"Download failed", fileData);
                  }
                  
              }
