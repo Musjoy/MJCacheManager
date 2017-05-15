@@ -304,8 +304,8 @@ static MJCacheManager *s_cacheManager = nil;
              // 如果是图片，这里还需要判断scale
              if (fileType == eCacheFileImage) {
                  //
-                 NSHTTPURLResponse *response = responseData;
-                 NSString *contentLocation = response.allHeaderFields[@"Content-Location"];
+                 NSHTTPURLResponse *theResponse = (NSHTTPURLResponse *)response;
+                 NSString *contentLocation = theResponse.allHeaderFields[@"Content-Location"];
                  if (contentLocation.length > 0) {
                      // 搜索@位置
                      NSRange range = [contentLocation rangeOfString:@"@"];
@@ -322,7 +322,6 @@ static MJCacheManager *s_cacheManager = nil;
                          }
                      }
                  }
-                 NSLog(@"%@", response);
              }
              // 获取成功，准备本地文件
              fileData = [self dataWithLocalFile:localFilePath andFileType:fileType];
