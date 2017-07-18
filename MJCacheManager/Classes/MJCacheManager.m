@@ -272,6 +272,11 @@ static MJCacheManager *s_cacheManager = nil;
 {
     
     // 空值保护
+    if (completion == NULL) {
+        completion = ^(BOOL isSucceed, NSString *message, NSObject *data) {};
+    }
+    
+    // 空值保护
     if (progressBlock == NULL) {
         progressBlock = ^(float percent, long long bytesReaded, long long bytesNeedToRead) {};
     }
