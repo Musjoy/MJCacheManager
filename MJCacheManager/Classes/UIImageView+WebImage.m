@@ -51,11 +51,7 @@ static char kImageIdentiferKey;
         // 网络图片需下载
         if (![aImageName hasPrefix:@"http"]) {
 #ifdef kServerUrl
-            if ([aImageName hasPrefix:@"/"]) {
-                aImageName = [kServerUrl stringByAppendingString:aImageName];
-            } else {
-                aImageName = [NSString stringWithFormat:@"%@/%@", kServerUrl, aImageName];
-            }
+            aImageName = [kServerUrl stringByAppendingString:aImageName];
 #else
             return;
 #endif
