@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'MJCacheManager'
-  s.version          = '0.1.2'
+  s.version          = '0.1.3'
   s.summary          = 'The management of the resource cache.'
 
   s.homepage         = 'https://github.com/Musjoy/MJCacheManager'
