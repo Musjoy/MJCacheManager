@@ -8,9 +8,8 @@
 
 #import "MJCacheManager.h"
 #import <MJWebService/MJWebService.h>
-#ifdef  HEADER_FILE_SOURCE
 #import HEADER_FILE_SOURCE
-#else
+#ifndef MODULE_FILE_SOURCE
 static NSMutableDictionary *s_localPaths = nil;
 #endif
 #ifdef MODULE_UTILS
