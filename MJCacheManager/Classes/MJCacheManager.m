@@ -7,14 +7,14 @@
 //
 
 #import "MJCacheManager.h"
-#import "MJWebService.h"
-#ifdef MODULE_FILE_SOURCE
-#import "FileSource.h"
+#import <MJWebService/MJWebService.h>
+#ifdef  HEADER_FILE_SOURCE
+#import HEADER_FILE_SOURCE
 #else
 static NSMutableDictionary *s_localPaths = nil;
 #endif
 #ifdef MODULE_UTILS
-#import "NSString+Utils.h"
+#import <MJUtils/NSString+Utils.h>
 #else
 #import <CommonCrypto/CommonDigest.h>
 #endif
