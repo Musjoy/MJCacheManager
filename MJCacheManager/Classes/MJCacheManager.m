@@ -163,7 +163,7 @@ static MJCacheManager *s_cacheManager = nil;
     // 远程的url为空或空字符串的话，直接返回
     if (fileUrl == nil || [fileUrl isEqualToString:@""]) {
         LogError(@"the fileUrl should not be nil!");
-        completion(NO, @"远程文件路径不能为空成功", nil);
+        completion ? completion(NO, @"远程文件路径不能为空成功", nil) : 0;
         return nil;
     }
     
