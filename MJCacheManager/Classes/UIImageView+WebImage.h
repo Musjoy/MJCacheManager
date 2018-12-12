@@ -16,6 +16,8 @@
 /// 设置默认加载图片
 + (void)setPlaceholderImage:(UIImage *)image;
 
+/// 更新唯一标识，用于处理列表中的复用问题
+- (void)updateIdentifer;
 
 #pragma mark - Image Name
 

@@ -35,6 +35,12 @@ static char kImageIdentiferKey;
     s_imgPlaceholder = image;
 }
 
+- (void)updateIdentifer
+{
+    NSString *identifer = [[NSUUID UUID] UUIDString];
+    [self setIdentifer:identifer];
+}
+
 
 #pragma mark - Image Name
 
